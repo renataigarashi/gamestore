@@ -5,8 +5,8 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const {
-    user,
     userLogged,
+    userFull,
     loading,
     loginUser,
     logoutUser,
@@ -15,12 +15,19 @@ const AuthProvider = ({ children }) => {
   } = useAuth();
 
   if (loading) {
-    return <h1>Loading...</h1>;
+    return <h1>Loading</h1>;
   }
 
   return (
     <AuthContext.Provider
-      value={{ user, userLogged, loginUser, logoutUser, message, registerUser }}
+      value={{
+        userLogged,
+        userFull,
+        loginUser,
+        logoutUser,
+        message,
+        registerUser
+      }}
     >
       {children}
     </AuthContext.Provider>

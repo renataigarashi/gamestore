@@ -6,7 +6,8 @@ import { MdLogout } from 'react-icons/md';
 import logo from '../../assets/logo.png';
 
 const Navbar = () => {
-  const { user, userLogged, logoutUser } = useContext(AuthContext);
+  const { userLogged, logoutUser, userFull } = useContext(AuthContext);
+
   const [message, setMessage] = useState(null);
   const navigate = useNavigate();
 
@@ -29,7 +30,13 @@ const Navbar = () => {
             </div>
 
             <img src="" alt="" />
-            <p className="text-gray-700">Bem vindo, {user}</p>
+            <p className="text-gray-700">Bem vindo, {userFull.name}</p>
+            <Link to="/admin">Admin</Link>
+            <img
+              src={userFull.image}
+              className="w-10 h-10 rounded-full"
+              alt="Avatar"
+            />
             <MdLogout className="w-6 h-6 cursor-pointer" onClick={logoutUser} />
           </div>
         ) : (

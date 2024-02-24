@@ -1,11 +1,20 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { findAllProductsApi } from '../../services/productService';
 
-import productsMock from '../../mocks/products';
 import Product from '../Product';
 
 const ProductList = () => {
-  const [products, setProducts] = useState(productsMock);
+  const [products, setProducts] = useState([]);
   console.log(products);
+
+  useEffect(() => {
+    getAllProducts();
+  }, []);
+
+  const getAllProducts = async () => {
+    const response = await findAllProductsApi();
+    setProducts(response.data);
+  };
 
   return (
     <section className="my-12 max-w-screen-xl mx-auto px-3">

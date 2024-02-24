@@ -1,79 +1,47 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  loginUserApi,
+  getUserById,
+  registerUserApi
+} from '../services/authService';
+import api from '../services/api';
 
 const useAuth = () => {
   const [userLogged, setUserLogged] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
+  const [userFull, setUserFull] = useState({});
   const [message, setMessage] = useState(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userInfo = localStorage.getItem('userInfo');
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
     if (userInfo) {
+      findUserById(userInfo.user._id);
       setUserLogged(true);
-      const parsedJson = JSON.parse(userInfo);
-      const name = parsedJson.user.name;
-
-      setUser(name);
+      api.defaults.headers.common['Authorization'] = `Bearer ${userInfo.token}`;
     }
     setLoading(false);
   }, []);
 
   const loginUser = async (inputValues) => {
-    const response = await fetch('http://localhost:3000/user/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(inputValues)
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      setUser(data.user.name);
+    try {
+      const response = await loginUserApi(inputValues);
+      const data = await response.data;
       localStorage.setItem('userInfo', JSON.stringify(data));
+      api.defaults.headers.common[
+        'Authorization'
+      ] = `Bearer ${response.data.token}`;
+      setUserFull(data.user);
       navigate('/');
       setUserLogged(true);
-    } else {
-      if (data.message) {
-        setMessage(data.message);
-        setTimeout(() => {
-          setMessage(null);
-        }, 5000);
-      }
-    }
-  };
-
-  const registerUser = async (inputValues) => {
-    const response = await fetch('http://localhost:3000/user/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(inputValues)
-    });
-
-    const data = await response.json();
-
-    if (data.message) {
-      setMessage(data.message);
+    } catch (error) {
+      setMessage(error.response.data.message);
       setTimeout(() => {
         setMessage(null);
-      }, 5000);
-    }
-
-    if (response.status === 201) {
-      setMessage(
-        'Usuário criado com sucesso! Você será redirecionado para a página de login.'
-      );
-      setTimeout(() => {
-        setMessage(null);
-        navigate('/login');
-      }, 6000);
+      }, 4000);
     }
   };
 
@@ -83,15 +51,49 @@ const useAuth = () => {
     navigate('/login');
   };
 
+  const findUserById = async (idUser) => {
+    const response = await getUserById(idUser);
+
+    setUserFull(response.data);
+  };
+
+  const registerUser = async (inputValues) => {
+    try {
+      const response = await registerUserApi(inputValues);
+
+      if (response.data.message) {
+        setMessage(response.data.message);
+        setTimeout(() => {
+          setMessage(null);
+        }, 4000);
+      }
+
+      if (response.status === 201) {
+        setMessage(
+          'Usuário criado com sucesso! Você será redirecionado para a página de login.'
+        );
+        setTimeout(() => {
+          setMessage(null);
+          navigate('/login');
+        }, 5000);
+      }
+    } catch (error) {
+      setMessage(error.response.data.message);
+      setTimeout(() => {
+        setMessage(null);
+      }, 4000);
+    }
+  };
+
   return {
-    user,
     userLogged,
     loading,
-    message,
     loginUser,
     logoutUser,
+    userFull,
+    message,
     registerUser
-  }; // aqui
+  };
 };
 
 export default useAuth;
