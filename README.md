@@ -10,7 +10,7 @@ Para executar este projeto localmente, siga estas etapas:
 
 2. Clone este repositório para o seu computador. Você pode usar o seguinte comando no terminal: `git clone https://github.com/renataigarashi/gamestore.git`
 
-3. Instale as dependências necessárias usando o npm (ou yarn, se preferir):
+3. Instale as dependências necessárias usando o npm: `npm install`
 
 4. Após a instalação das dependências, você pode iniciar o servidor de desenvolvimento usando o seguinte comando: `npm start`
 
